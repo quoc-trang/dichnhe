@@ -13,7 +13,7 @@ export default function TranslateTrainer() {
   const t = useTrainer();
   useEffect(() => {
     t.generate()
-  }, [])
+  }, [t.difficulty, t.topic])
 
   return (
     <div style={styles.root}>
