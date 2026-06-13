@@ -308,6 +308,12 @@ export const styles = {
     fontWeight: 600,
     color: "#3f6b1e",
   },
+  cursor: {
+    display: "inline-block",
+    marginLeft: 2,
+    color: "#e0a91b",
+    animation: "blink 1s infinite",
+  },
 };
 
 export const scoreColor = (s) =>

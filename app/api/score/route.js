@@ -139,6 +139,47 @@ Respond ONLY with the JSON object, no other text.`;
   return JSON.parse(content);
 }
 
+function buildGenerateStreamPrompt(payload) {
+  const { difficulty, difficultyDesc, topic, avoid } = payload;
+  return `Generate ONE Vietnamese sentence for an English-learning exercise.
+
+Difficulty: ${difficulty} (${difficultyDesc})
+Topic: ${topic}
+Avoid sentences similar to these already used: ${JSON.stringify(avoid || [])}
+
+The sentence must be natural, grammatically correct Vietnamese that a learner will translate INTO English.
+
+Respond in EXACTLY this format, with no other text before or after:
+VI: <the Vietnamese sentence>
+HINT: <short English grammar/structure hint>`;
+}
+
+async function streamGroqGenerate(payload) {
+  const prompt = buildGenerateStreamPrompt(payload);
+
+  const r = await fetch(GROQ_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 256,
+    }),
+  });
+
+  if (!r.ok) {
+    const errText = await r.text();
+    throw new Error(`Groq error ${r.status}: ${errText}`);
+  }
+
+  return r.body;
+}
+
 export async function POST(req) {
   const ip =
     (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() ||
@@ -172,6 +213,22 @@ export async function POST(req) {
       { error: 'Server missing GROQ_API_KEY' },
       { status: 500 },
     );
+  }
+
+  if (body.type === 'generate' && PROVIDER === 'groq') {
+    try {
+      const stream = await streamGroqGenerate(body.payload);
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache, no-transform',
+          'X-Accel-Buffering': 'no',  // disable nginx-style buffering
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      return Response.json({ error: 'Stream failed' }, { status: 502 });
+    }
   }
 
   try {
