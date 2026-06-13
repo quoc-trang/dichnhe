@@ -1,0 +1,46 @@
+# Cloud Build pipeline cho dich-nhe app
+# Trigger: push lên main → build Docker image → push Artifact Registry → deploy Cloud Run
+
+steps:
+  # Bước 1: Build Docker image (Cloud Build chạy luôn linux/amd64 — không lo M-series)
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/dichnhe/dichnhe:$COMMIT_SHA'
+      - '-t'
+      - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/dichnhe/dichnhe:latest'
+      - '.'
+
+  # Bước 2: Push image lên Artifact Registry (cả 2 tag: commit SHA + latest)
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/dichnhe/dichnhe'
+
+  # Bước 3: Deploy lên Cloud Run với image vừa build
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'services'
+      - 'update'
+      - 'dichnhe'
+      - '--region=asia-southeast1'
+      - '--image=asia-southeast1-docker.pkg.dev/$PROJECT_ID/dichnhe/dichnhe:$COMMIT_SHA'
+
+# Tag image bằng cả commit SHA và 'latest' để dễ rollback
+images:
+  - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/dichnhe/dichnhe:$COMMIT_SHA'
+  - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/dichnhe/dichnhe:latest'
+
+# Optional: timeout (mặc định 10 phút, đủ cho app này)
+timeout: '1200s'
+
+# Optional: dùng machine mạnh hơn nếu build chậm (mặc định e2-standard-2 OK)
+# options:
+#   machineType: 'E2_HIGHCPU_8'
