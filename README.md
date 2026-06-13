@@ -104,6 +104,22 @@ gcloud run services update dichnhe \
 Push to `main` triggers Cloud Build, which builds the image, pushes to Artifact
 Registry, and deploys to Cloud Run. Average end-to-end: ~3-5 minutes.
 
+The trigger uses an **ignored files filter** so doc-only or repo-housekeeping
+changes don't burn build minutes:
+
+```
+README.md
+**/*.md
+.gitignore
+LICENSE
+.github/**
+```
+
+Anything outside this list (code, `package.json`, `Dockerfile`,
+`cloudbuild.yaml`, etc.) still triggers a full build → push → deploy. If you
+add a new doc file or housekeeping path, add it to the filter on the trigger
+config: **Cloud Build → Triggers → deploy-on-push-main → Ignored files filter**.
+
 ### Secrets
 
 `GROQ_API_KEY` is stored in **Google Secret Manager** (not in the image or env
