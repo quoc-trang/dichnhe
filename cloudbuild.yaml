@@ -41,6 +41,9 @@ images:
 # Optional: timeout (mặc định 10 phút, đủ cho app này)
 timeout: '1200s'
 
-# Optional: dùng machine mạnh hơn nếu build chậm (mặc định e2-standard-2 OK)
-# options:
-#   machineType: 'E2_HIGHCPU_8'
+# Bắt buộc khi trigger 2nd gen dùng custom service account
+# CLOUD_LOGGING_ONLY → log gửi vào Cloud Logging, không cần GCS bucket
+options:
+  logging: CLOUD_LOGGING_ONLY
+  # Optional: dùng machine mạnh hơn nếu build chậm
+  # machineType: 'E2_HIGHCPU_8'
