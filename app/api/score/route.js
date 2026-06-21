@@ -42,16 +42,50 @@ const SCORE_SCHEMA = {
   type: 'object',
   properties: {
     score: { type: 'integer', description: 'Score 0-100' },
-    verdict: { type: 'string', description: 'Short phrase verdict' },
-    feedback: { type: 'string', description: '2-3 sentences of specific, kind feedback in English' },
+    verdict: { type: 'string', description: 'Short Vietnamese phrase verdict' },
+    vietnameseFeedback: {
+      type: 'string',
+      description: '2-3 sentences of specific, kind feedback in Vietnamese',
+    },
+    wordChanges: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          from: {
+            type: 'string',
+            description: 'The exact word or phrase from the student answer that should change',
+          },
+          to: {
+            type: 'string',
+            description: 'The better suggested word or phrase',
+          },
+          reason: {
+            type: 'string',
+            description:
+              "Explain in Vietnamese why the student's original word or phrase should not be used here",
+          },
+        },
+        required: ['from', 'to', 'reason'],
+        additionalProperties: false,
+      },
+      description: 'Concrete word or phrase changes the student should make',
+    },
     correction: { type: 'string', description: 'One natural correct English translation' },
     errors: {
       type: 'array',
       items: { type: 'string' },
-      description: 'Short error notes',
+      description: 'Short Vietnamese error notes',
     },
   },
-  required: ['score', 'verdict', 'feedback', 'correction', 'errors'],
+  required: [
+    'score',
+    'verdict',
+    'vietnameseFeedback',
+    'wordChanges',
+    'correction',
+    'errors',
+  ],
   additionalProperties: false,
 };
 
@@ -80,7 +114,14 @@ Vietnamese sentence: "${vi}"
 Student's English translation: "${answer}"
 
 Score 0-100 on meaning accuracy, grammar, and natural phrasing. Be encouraging but honest.
-Provide 2-3 sentences of specific, kind feedback in English, one natural correct English translation, and a short list of error notes.`,
+Provide:
+- 2-3 sentences of specific, kind feedback in Vietnamese.
+- A short Vietnamese verdict, not English.
+- One natural correct English translation.
+- A list of exact words or phrases from the student's answer that should change. For each one, include the better word/phrase and explain in Vietnamese why the student's original word or phrase should not be used in this sentence. Focus on the problem with the user's word first, then briefly mention why the suggested word fits better.
+- A short list of error notes in Vietnamese.
+
+If the student's translation is already excellent, wordChanges can be an empty array.`,
       schema: SCORE_SCHEMA,
     };
   }
