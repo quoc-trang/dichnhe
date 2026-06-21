@@ -32,9 +32,8 @@ const GENERATE_SCHEMA = {
   type: 'object',
   properties: {
     vi: { type: 'string', description: 'The Vietnamese sentence' },
-    hint: { type: 'string', description: 'Short English grammar/structure hint' },
   },
-  required: ['vi', 'hint'],
+  required: ['vi'],
   additionalProperties: false,
 };
 
@@ -100,8 +99,7 @@ Difficulty: ${difficulty} (${difficultyDesc})
 Topic: ${topic}
 Avoid sentences similar to these already used: ${JSON.stringify(avoid || [])}
 
-The sentence must be natural, grammatically correct Vietnamese that a learner will translate INTO English.
-Also include a short English grammar/structure hint.`,
+The sentence must be natural, grammatically correct Vietnamese that a learner will translate INTO English.`,
       schema: GENERATE_SCHEMA,
     };
   }
@@ -191,8 +189,7 @@ Avoid sentences similar to these already used: ${JSON.stringify(avoid || [])}
 The sentence must be natural, grammatically correct Vietnamese that a learner will translate INTO English.
 
 Respond in EXACTLY this format, with no other text before or after:
-VI: <the Vietnamese sentence>
-HINT: <short English grammar/structure hint>`;
+VI: <the Vietnamese sentence>`;
 }
 
 async function streamGroqGenerate(payload) {

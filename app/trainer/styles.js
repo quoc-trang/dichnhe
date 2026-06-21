@@ -160,14 +160,6 @@ export const styles = {
     padding: "3px 11px",
     borderRadius: 999,
   },
-  hint: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#b5882a",
-    background: "#fdf3d2",
-    padding: "4px 11px",
-    borderRadius: 999,
-  },
   viWrap: { position: "relative", paddingLeft: 6 },
   vi: {
     fontFamily: "'Baloo 2', cursive",

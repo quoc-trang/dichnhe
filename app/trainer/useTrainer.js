@@ -19,11 +19,9 @@ export function useTrainer() {
   const seen = useRef([]);
 
   function parseStreamedGenerate(text) {
-    const viMatch = text.match(/VI:\s*(.+?)(?=\nHINT:|$)/s);
-    const hintMatch = text.match(/HINT:\s*(.+?)$/s);
+    const viMatch = text.match(/VI:\s*(.+?)$/s);
     return {
       vi: viMatch?.[1]?.trim() || '',
-      hint: hintMatch?.[1]?.trim() || '',
     };
   }
 
@@ -32,7 +30,7 @@ export function useTrainer() {
     setError("");
     setResult(null);
     setAnswer("");
-    setCurrent({ vi: '', hint: '' });
+    setCurrent({ vi: '' });
     const d = DIFFICULTIES.find((x) => x.key === difficulty);
     let streamedText = '';
     await streamApi(
@@ -46,7 +44,6 @@ export function useTrainer() {
       {
         onChunk: (chunk) => {
           streamedText += chunk;
-          // Parse từng dòng VI: / HINT:
           const parsed = parseStreamedGenerate(streamedText);
           setCurrent(parsed);
         },

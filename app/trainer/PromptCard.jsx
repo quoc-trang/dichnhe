@@ -10,7 +10,6 @@ export function PromptCard({ current, count, genLoading }) {
     <div style={styles.card}>
       <div style={styles.cardTop}>
         <span style={styles.badge}>#{String(count).padStart(2, "0")}</span>
-        {current?.hint && !genLoading && <span style={styles.hint}>{current.hint}</span>}
       </div>
 
       {genLoading && !current?.vi ? (
