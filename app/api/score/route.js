@@ -7,7 +7,7 @@ import Anthropic from '@anthropic-ai/sdk';
 const PROVIDER = process.env.LLM_PROVIDER || 'groq';
 
 const ANTHROPIC_MODEL = 'claude-haiku-4-5';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GROQ_MODEL = 'openai/gpt-oss-20b';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 // --- simple in-memory rate limit (per IP). Resets on cold start.
@@ -142,8 +142,8 @@ async function callAnthropic(request) {
 }
 
 async function callGroq(request) {
-  // Groq supports JSON mode reliably; we embed the schema in the prompt so Llama
-  // returns the exact shape we need.
+  // Groq supports JSON mode reliably; we embed the schema in the prompt so the
+  // model returns the exact shape we need.
   const systemPrompt = `You must respond with valid JSON matching exactly this schema:
 ${JSON.stringify(request.schema, null, 2)}
 

@@ -6,27 +6,27 @@ App Router and deployed on Google Cloud Run.
 
 🌐 Live: https://dichnhe-895490522576.asia-southeast1.run.app/
 
-## AI: Groq + Llama 3.3 70B
+## AI: Groq + GPT OSS 20B
 
-This app uses **Groq** as the LLM provider, running Meta's open-source
-**Llama 3.3 70B Versatile** model.
+This app uses **Groq** as the LLM provider, running the open-weight
+**GPT OSS 20B** model (`openai/gpt-oss-20b`).
 
 ### Why Groq?
 
 - **Fastest inference on the planet** — Groq designed custom chips called LPUs
-  (Language Processing Units) specifically for LLM inference. Llama 3.3 70B
-  runs at ~280 tokens/sec on Groq vs ~60-80 t/s on OpenAI / Anthropic. For an
-  interactive translation grader, the latency difference is night and day.
-- **Generous free tier** — 100K tokens/day on Llama 3.3 70B, no credit card.
-  More than enough for personal use.
+  (Language Processing Units) specifically for LLM inference. GPT OSS 20B is
+  served with low latency on Groq, which matters for an interactive translation
+  grader where users wait on generated prompts and feedback.
+- **Recommended replacement model** — Groq recommends GPT OSS 20B for workloads
+  moving off deprecated Llama 3.1 8B Instant usage.
 - **OpenAI-compatible API** — easy to wire up, no extra SDK required.
-- **Open-source model** — Llama weights are public; no vendor lock-in beyond
-  the API gateway.
+- **Open-weight model** — GPT OSS weights are available outside Groq too; there
+  is no vendor lock-in beyond the API gateway.
 
 ### What is Groq, exactly?
 
 Groq is an inference company, not a model lab — they don't train LLMs. Instead,
-they host open-source models (Llama family, DeepSeek, Qwen, Whisper, etc.) on
+they host open and proprietary models (GPT OSS, Llama family, DeepSeek, Qwen, Whisper, etc.) on
 their custom LPU hardware and expose them via API. Founded by Jonathan Ross,
 former Google TPU designer.
 
@@ -37,7 +37,7 @@ via the `LLM_PROVIDER` env var:
 
 | Provider | Model | Cost |
 |---|---|---|
-| `groq` (default) | `llama-3.3-70b-versatile` | Free tier 100K tokens/day |
+| `groq` (default) | `openai/gpt-oss-20b` | Recommended Groq replacement for Llama 3.1 8B Instant |
 | `anthropic` | `claude-haiku-4-5` | Pay-as-you-go (~$0.0003/grading) |
 
 Both providers return JSON conforming to the same schema, so the frontend
@@ -139,8 +139,8 @@ Accessor` role on the secret.
   protection back it with Upstash Redis or Cloud Memorystore.
 - Groq free-tier requests may be used to improve their service. Fine for a
   practice app, but tell users if you handle anything sensitive.
-- Llama 3.3 is text-only — no image input. If you ever need vision, switch
-  to a multimodal provider (Gemini, GPT-4o, Claude).
+- GPT OSS 20B is text-only in this app — no image input. If you ever need
+  vision, switch to a multimodal provider (Gemini, GPT-4o, Claude).
 - Cloud Run cold starts add ~2-3s on the first request after idle. Set
   `--min-instances=1` to keep one instance warm (~$3-5/month).
 
