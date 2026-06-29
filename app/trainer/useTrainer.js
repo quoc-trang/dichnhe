@@ -19,7 +19,13 @@ export function useTrainer() {
   const seen = useRef([]);
 
   function parseStreamedGenerate(text) {
-    const viMatch = text.match(/VI:\s*(.+?)$/s);
+    const cleanedText = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    const jsonMatch = cleanedText.match(/\{[\s\S]*"vi"\s*:\s*"([^"]+)"[\s\S]*\}/i);
+    if (jsonMatch) {
+      return { vi: jsonMatch[1].trim() };
+    }
+
+    const viMatch = cleanedText.match(/(?:^|\n)\s*(?:[-*]\s*)?(?:\*\*)?VI(?:\*\*)?\s*:\s*(.+?)\s*$/is);
     return {
       vi: viMatch?.[1]?.trim() || '',
     };
